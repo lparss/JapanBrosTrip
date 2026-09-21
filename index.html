@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Japan Bros Trip</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Japan Bros Trip">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --bg: #121729;
+    --bg-elevated: #1a2138;
+    --bg-card: #1c2440;
+    --rail: #2a335a;
+    --paper: #f2ead9;
+    --paper-dim: #b9b2a1;
+    --gold: #d4af6a;
+    --vermillion: #c9432c;
+    --teal: #3f8f8a;
+    --plum: #8064ad;
+    --slate: #5c7fb8;
+    --gray: #6b7280;
+    --line: rgba(242,234,217,0.1);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background: var(--bg);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom: 20px;
+  }
+  .hero{
+    padding: 32px 20px 26px;
+    background: linear-gradient(180deg, #1a2138 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--vermillion);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before{
+    content: "";
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,175,106,0.25) 0%, transparent 70%);
+  }
+  .hero::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.16;
+    background-image:
+      radial-gradient(circle at 0px 8px, transparent 9px, rgba(242,234,217,0.5) 9.5px, rgba(242,234,217,0.5) 10.5px, transparent 11px),
+      radial-gradient(circle at 24px 8px, transparent 9px, rgba(242,234,217,0.5) 9.5px, rgba(242,234,217,0.5) 10.5px, transparent 11px),
+      radial-gradient(circle at 48px 8px, transparent 9px, rgba(242,234,217,0.5) 9.5px, rgba(242,234,217,0.5) 10.5px, transparent 11px);
+    background-size: 48px 22px;
+    mask-image: linear-gradient(180deg, transparent 0%, black 55%, black 100%);
+    pointer-events: none;
+  }
+  .hero-kicker-line{
+    position: absolute;
+    top: 0; left: 0;
+    width: 5px; height: 100%;
+    background: linear-gradient(180deg, var(--vermillion), transparent);
+  }
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 8px;
+  }
+  h1{
+    font-family: 'Shippori Mincho', serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    line-height: 1.15;
+    color: var(--paper);
+  }
+  .hero-sub{
+    font-size: 13.5px;
+    color: var(--paper-dim);
+    margin: 0;
+  }
+  .stats{
+    display: flex;
+    gap: 18px;
+    margin-top: 18px;
+  }
+  .stat{
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stat .n{
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gold);
+    display:block;
+  }
+  .stat .l{
+    font-size: 10px;
+    color: var(--paper-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .hotels-title{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--paper-dim);
+    margin: 18px 0 8px;
+  }
+  .collapsible-section{
+    margin-top: 12px;
+  }
+  .section-toggle{
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+  }
+  .section-toggle-count{
+    margin-left: auto;
+    color: var(--paper-dim);
+    font-size: 11px;
+  }
+  .section-toggle-chevron{
+    color: var(--paper-dim);
+    font-size: 12px;
+    transition: transform 0.2s ease;
+  }
+  .section-toggle.open .section-toggle-chevron{ transform: rotate(180deg); }
+  .section-toggle.open{ border-color: var(--vermillion); }
+  .section-content{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .section-content.open{
+    max-height: 2000px;
+    margin-top: 10px;
+  }
+  .hotels-strip{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hotel-chip{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--teal);
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
+  .hotel-chip .hname{
+    font-family: 'Shippori Mincho', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--paper);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    min-width: 0;
+  }
+  .hotel-chip .hdates{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--paper-dim);
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .hotel-chip .haddress{
+    font-size: 10.5px;
+    color: var(--paper-dim);
+    margin: 2px 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hotel-chip-add{
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 9px 12px;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    color: var(--paper-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .flight-chip{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--slate);
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
+  .flight-chip .fname{
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--paper);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .flight-chip .froute{
+    font-size: 11px;
+    color: var(--paper-dim);
+    margin-top: 2px;
+  }
+  .flight-chip .fdates{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--paper-dim);
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .hotel-edit-panel{
+    display: none;
+    margin-top: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .hotel-line{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: rgba(63,143,138,0.14);
+  }
+  .hotel-line.checkin{ background: rgba(63,143,138,0.18); }
+  .hotel-line.checkout{ background: rgba(201,67,44,0.14); }
+  .hotel-line .hkanji{
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    background: var(--teal);
+    color: var(--paper);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transform: rotate(-3deg);
+  }
+  .hotel-line.checkout .hkanji{ background: var(--vermillion); }
+  .hotel-line .htext{
+    flex: 1;
+    font-size: 12.5px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hotel-line .hstatus{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: rgba(242,234,217,0.12);
+    color: var(--paper-dim);
+  }
+  .hotel-line.checkin .hstatus{ color: var(--teal); }
+  .hotel-line.checkout .hstatus{ color: var(--vermillion); }
+  .hotel-badge{
+    margin-left: 6px;
+    font-size: 12px;
+  }
+  .flight-line{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: rgba(92,127,184,0.14);
+  }
+  .flight-line.arr{ background: rgba(212,175,106,0.14); }
+  .flight-line .fkanji{
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    background: var(--slate);
+    color: var(--paper);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transform: rotate(-3deg);
+  }
+  .flight-line.arr .fkanji{ background: var(--gold); color: #1a1508; }
+  .flight-line .ftext{
+    flex: 1;
+    font-size: 12.5px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .timeline{
+    padding: 28px 16px 0;
+    position: relative;
+  }
+  .day{
+    display: flex;
+    gap: 10px;
+    position: relative;
+  }
+  .rail-col{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    flex-shrink: 0;
+  }
+  .dot{
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    background: var(--vermillion);
+    border: 1.5px solid rgba(242,234,217,0.55);
+    outline: 1px solid rgba(201,67,44,0.4);
+    outline-offset: 2px;
+    margin-top: 16px;
+    flex-shrink: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-3deg);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  }
+  .dot span{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--paper);
+    transform: rotate(3deg);
+  }
+  .connector{
+    width: 2px;
+    flex: 1;
+    background: repeating-linear-gradient(180deg, var(--rail) 0, var(--rail) 4px, transparent 4px, transparent 8px);
+    margin-top: 2px;
+  }
+  .day:last-child .connector{ display:none; }
+
+  .card{
+    flex: 1;
+    background:
+      repeating-linear-gradient(115deg, rgba(242,234,217,0.015) 0px, rgba(242,234,217,0.015) 1px, transparent 1px, transparent 3px),
+      var(--bg-card);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--vermillion);
+    border-radius: 4px 4px 10px 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+  .card-head{
+    display: flex;
+    align-items: center;
+    padding: 14px 14px 10px;
+    cursor: pointer;
+    gap: 14px;
+  }
+  .date-block{
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.1;
+    flex: 0 0 auto;
+    min-width: 44px;
+    white-space: nowrap;
+  }
+  .date-block .dow{
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--paper-dim);
+    display:block;
+  }
+  .date-block .dnum{
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--paper);
+    white-space: nowrap;
+  }
+  .head-meta{
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .city-name{
+    font-family: 'Shippori Mincho', serif;
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .kanji-tag{
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--paper-dim);
+    letter-spacing: 0.05em;
+  }
+  .chip{
+    display: inline-block;
+    font-size: 10.5px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+  }
+  .chevron{
+    color: var(--paper-dim);
+    font-size: 13px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+  .card.open .chevron{ transform: rotate(180deg); }
+
+  .card-body{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .card.open .card-body{ max-height: 900px; }
+  .card-body-inner{
+    padding: 4px 14px 16px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+
+  .note-line{
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    padding: 5px 0;
+  }
+  .note-line.heading{
+    font-weight: 600;
+    color: var(--gold);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 8px;
+  }
+  .note-line input[type=checkbox]{
+    margin-top: 3px;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+    width: 15px; height: 15px;
+  }
+  .note-line.checked .txt{
+    text-decoration: line-through;
+    color: var(--paper-dim);
+  }
+  .note-line .txt{ flex: 1; }
+
+  .edit-row{
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .field{
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label{
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--paper-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  input[type=text], input[type=date], select, textarea{
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    width: 100%;
+  }
+  textarea{
+    min-height: 90px;
+    resize: vertical;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+  select{ appearance:none; }
+
+  .activity-edit-list{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .activity-edit-row{
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .activity-edit-row input[type=text]{
+    flex: 1;
+  }
+  .remove-activity{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--paper-dim);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    flex-shrink: 0;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .hint{
+    font-size: 12.5px;
+    color: var(--paper-dim);
+    margin: 2px 0;
+  }
+  .notes-block{
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--vermillion);
+    border-radius: 0 8px 8px 0;
+  }
+  .notes-label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--vermillion);
+    margin: 0 0 4px;
+  }
+  .notes-text{
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--paper-dim);
+    margin: 0;
+  }
+  .btn-row{
+    display:flex;
+    gap:8px;
+    margin-top: 12px;
+  }
+  .btn{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    cursor: pointer;
+  }
+  .btn-save{ background: var(--gold); color: #1a1508; font-weight:600; }
+  .btn-del{ background: transparent; color: var(--vermillion); border: 1px solid var(--vermillion); }
+  .btn-edit{ background: var(--bg-elevated); color: var(--paper-dim); border: 1px solid var(--line); }
+
+  .add-day-btn{
+    display: block;
+    width: calc(100% - 32px);
+    margin: 4px 16px 32px;
+    box-sizing: border-box;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--bg-elevated);
+    border: 1.5px dashed var(--line);
+    color: var(--paper-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    cursor: pointer;
+  }
+  .add-day-btn:active{ border-color: var(--vermillion); color: var(--paper); }
+  .status{
+    position: fixed;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-elevated);
+    border: 1px solid var(--vermillion);
+    color: var(--paper-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .status.show{ opacity: 1; }
+  .refresh-btn{
+    position: fixed;
+    top: 14px; right: 16px;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    color: var(--paper-dim);
+    font-size: 19px;
+    line-height: 1;
+    z-index: 25;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .refresh-btn:active{ transform: rotate(-90deg); transition: transform 0.3s ease; }
+  .empty{
+    text-align:center;
+    padding: 40px 20px;
+    color: var(--paper-dim);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="status" id="status">guardado</div>
+<button class="refresh-btn" id="refreshBtn" title="Actualizar">⟳</button>
+
+<div class="hero">
+  <div class="hero-kicker-line"></div>
+  <p class="eyebrow">東京 · 大阪 · 京都</p>
+  <h1>Japan Bros Trip</h1>
+  <div class="stats">
+    <div class="stat"><span class="n" id="statDays">–</span><span class="l">días en Japón</span></div>
+    <div class="stat"><span class="n" id="statCities">–</span><span class="l">ciudades diferentes</span></div>
+  </div>
+  <div class="collapsible-section">
+    <button class="section-toggle" id="hotelsToggle">
+      <span>🏨 Hoteles</span>
+      <span class="section-toggle-count" id="hotelsCount">0</span>
+      <span class="section-toggle-chevron">▾</span>
+    </button>
+    <div class="section-content" id="hotelsContent">
+      <div class="hotels-strip" id="hotelsStrip"></div>
+      <div class="hotel-edit-panel" id="hotelsEditPanel"></div>
+    </div>
+  </div>
+  <div class="collapsible-section">
+    <button class="section-toggle" id="flightsToggle">
+      <span>✈️ Vuelos</span>
+      <span class="section-toggle-count" id="flightsCount">0</span>
+      <span class="section-toggle-chevron">▾</span>
+    </button>
+    <div class="section-content" id="flightsContent">
+      <div class="hotels-strip" id="flightsStrip"></div>
+      <div class="hotel-edit-panel" id="flightsEditPanel"></div>
+    </div>
+  </div>
+</div>
+
+<div class="timeline" id="timeline">
+  <div class="empty">Cargando itinerario…</div>
+</div>
+
+<button class="add-day-btn" id="addDayBtn">+ Agregar día</button>
+
+<script>
+const STORAGE_KEY = 'itinerario-japon-days'; // usado solo como fallback local
+const DOW = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+
+// ====== CONFIGURA ESTO CON TUS DATOS DE SUPABASE ======
+const SUPABASE_URL = 'https://uxtvgscbpbohegwjegjq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dHZnc2NicGJvaGVnd2plZ2pxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3Nzk5MTMsImV4cCI6MjA5OTM1NTkxM30.ejpNi9MPJnsgbMSB5nfWiZEAVeWDh2j9J2U4FvuqUl4';
+// =========================================================
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+document.getElementById('refreshBtn').addEventListener('click', ()=> location.reload());
+
+document.getElementById('hotelsToggle').addEventListener('click', ()=>{
+  hotelsOpen = !hotelsOpen;
+  updateSectionToggles();
+});
+document.getElementById('flightsToggle').addEventListener('click', ()=>{
+  flightsOpen = !flightsOpen;
+  updateSectionToggles();
+});
+
+function updateSectionToggles(){
+  const hTog = document.getElementById('hotelsToggle');
+  const hCon = document.getElementById('hotelsContent');
+  hTog.classList.toggle('open', hotelsOpen);
+  hCon.classList.toggle('open', hotelsOpen);
+  document.getElementById('hotelsCount').textContent = hotels.length;
+
+  const fTog = document.getElementById('flightsToggle');
+  const fCon = document.getElementById('flightsContent');
+  fTog.classList.toggle('open', flightsOpen);
+  fCon.classList.toggle('open', flightsOpen);
+  document.getElementById('flightsCount').textContent = flights.length;
+}
+
+const CATEGORY_STYLES = {
+  'Tiempo libre': { bg:'rgba(92,127,184,0.18)', fg:'#8fa9d6' },
+  'Shopping':     { bg:'rgba(212,175,106,0.18)', fg:'#d4af6a' },
+  'Viajando':     { bg:'rgba(201,67,44,0.18)',   fg:'#e0715a' },
+  'Excursión':    { bg:'rgba(128,100,173,0.18)', fg:'#a68fd1' },
+  'Sin categoría':{ bg:'rgba(107,114,128,0.18)', fg:'#9aa0aa' }
+};
+const CITY_KANJI = {
+  'seattle': 'シアトル', 'ginza': '銀座', 'tokio': '東京', 'tokyo': '東京',
+  'osaka': '大阪', 'kyoto': '京都', 'kioto': '京都',
+  'yokohama': '横浜', 'hakone': '箱根', 'nikko': '日光', 'nikkō': '日光'
+};
+const CITY_COLORS = {
+  'seattle': '#6b7280', 'ginza': '#d4af6a', 'tokio': '#d4af6a', 'tokyo': '#d4af6a',
+  'osaka': '#3f8f8a', 'kyoto': '#8064ad', 'kioto': '#8064ad',
+  'yokohama': '#5c7fb8', 'hakone': '#7a9d54', 'nikko': '#b06a3f', 'nikkō': '#b06a3f'
+};
+
+const DEFAULT_DAYS = [
+  {id:'d1', date:'2026-10-09', city:'Seattle', category:'Tiempo libre', notes:'Seattle', checked:{}},
+  {id:'d2', date:'2026-10-10', city:'Seattle', category:'Tiempo libre', notes:'Seattle', checked:{}},
+  {id:'d3', date:'2026-10-11', city:'Seattle', category:'Tiempo libre', notes:'Seattle', checked:{}},
+  {id:'d4', date:'2026-10-12', city:'Ginza', category:'Tiempo libre',
+    notes:'- Llegamos a Japón en la noche, aterrizamos 7:00 pm\n- Ir a Ramen Hidakaya Higashi-Ginza shop\n- Si hay tiempo, ir al Donki de Remm Plus', checked:{}},
+  {id:'d5', date:'2026-10-13', city:'Ginza / Shibuya', category:'Shopping',
+    notes:'Shopping Day\n- Café y algo rápido en DOUTOR o TURRET CAFE cerca del hotel (abren 7 am)\n- Ir a Shibuya al Mega Donquijote, de ahí a Bic Camera\n- Según el tiempo: comer bien o Family Mart / fast food\n- 2:00 pm ir a outlet, llegaríamos a las 3\n- Al final del día: Uniqlo y Muji de Ginza para comprar algo de ropa', checked:{}},
+  {id:'d6', date:'2026-10-14', city:'Osaka', category:'Viajando',
+    notes:'Vamos a Osaka temprano para aprovechar el día allá', checked:{}},
+  {id:'d7', date:'2026-10-15', city:'Kioto', category:'Sin categoría', notes:'Kyoto day trip', checked:{}},
+  {id:'d8', date:'2026-10-16', city:'Osaka', category:'Sin categoría', notes:'Osaka day trip', checked:{}},
+  {id:'d9', date:'2026-10-17', city:'Osaka', category:'Sin categoría', notes:'Osaka day', checked:{}},
+  {id:'d10', date:'2026-10-18', city:'Tokio', category:'Viajando', notes:'Notas', checked:{}},
+  {id:'d11', date:'2026-10-19', city:'Yokohama', category:'Sin categoría', notes:'Yokohama', checked:{}},
+  {id:'d12', date:'2026-10-20', city:'Tokio', category:'Sin categoría', notes:'Notas', checked:{}},
+  {id:'d13', date:'2026-10-21', city:'Tokio', category:'Sin categoría', notes:'Notas', checked:{}},
+  {id:'d14', date:'2026-10-22', city:'Tokio', category:'Tiempo libre', notes:'Último día en Tokio, a las 9:00 pm nos vamos al aeropuerto', checked:{}},
+];
+
+const DEFAULT_FLIGHTS = [
+  { id:'f1', flight_no:'NH117', from_city:'Seattle', to_city:'Tokio (Haneda)', dep_date:'2026-10-11', dep_time:'16:30', arr_date:'2026-10-12', arr_time:'19:00' },
+  { id:'f2', flight_no:'NH118', from_city:'Tokio (Haneda)', to_city:'Seattle', dep_date:'2026-10-22', dep_time:'21:15', arr_date:'2026-10-22', arr_time:'14:25' }
+];
+
+let days = [];
+let openId = null;
+let editId = null;
+let hotels = [];
+let editHotelId = null;
+let hotelsOpen = false;
+let flights = [];
+let editFlightId = null;
+let flightsOpen = false;
+
+function migrateDay(day){
+  if(!Array.isArray(day.activities)){
+    const lines = (day.notes||'').split('\n').filter(l => l.trim().length);
+    const activities = [];
+    const noteLines = [];
+    lines.forEach((line, i) => {
+      const trimmed = line.trim();
+      if(trimmed.startsWith('-')){
+        activities.push({ text: trimmed.replace(/^-\s*/, ''), checked: !!(day.checked && day.checked[i]) });
+      } else {
+        noteLines.push(trimmed);
+      }
+    });
+    day.activities = activities;
+    day.notes = noteLines.join('\n');
+    delete day.checked;
+  }
+  return day;
+}
+
+function showStatus(msg){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 1400);
+}
+
+async function loadDays(){
+  try{
+    const { data, error } = await supabaseClient
+      .from('itinerary_days')
+      .select('*')
+      .order('date', { ascending: true });
+    if(error) throw error;
+
+    if(data && data.length){
+      days = data.map(rowToDay).map(migrateDay);
+      cacheLocally();
+      return;
+    }
+
+    // tabla vacía todavía: sembramos los datos por default
+    days = DEFAULT_DAYS.map(migrateDay);
+    for(const day of days){ await upsertDayRemote(day); }
+    cacheLocally();
+  }catch(e){
+    console.warn('No se pudo conectar a Supabase, usando copia local si existe.', e);
+    const cached = localStorage.getItem(STORAGE_KEY);
+    days = cached ? JSON.parse(cached).map(migrateDay) : DEFAULT_DAYS.map(migrateDay);
+    showStatus('sin conexión, mostrando copia local');
+  }
+}
+
+function cacheLocally(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(days)); }catch(e){}
+}
+
+function rowToDay(row){
+  return {
+    id: row.id,
+    date: row.date,
+    city: row.city || '',
+    category: row.category || 'Sin categoría',
+    activities: row.activities || [],
+    notes: row.notes || ''
+  };
+}
+
+async function upsertDayRemote(day, notify){
+  cacheLocally();
+  try{
+    const { error } = await supabaseClient.from('itinerary_days').upsert({
+      id: day.id,
+      date: day.date,
+      city: day.city,
+      category: day.category,
+      activities: day.activities,
+      notes: day.notes,
+      updated_at: new Date().toISOString()
+    });
+    if(error) throw error;
+    if(notify) showStatus('guardado ✓');
+  }catch(e){
+    console.warn('Error guardando en Supabase', e);
+    if(notify) showStatus('sin conexión, se reintentará');
+  }
+}
+
+async function deleteDayRemote(id){
+  try{
+    const { error } = await supabaseClient.from('itinerary_days').delete().eq('id', id);
+    if(error) throw error;
+  }catch(e){
+    console.warn('Error eliminando en Supabase', e);
+  }
+  cacheLocally();
+}
+
+async function loadHotels(){
+  try{
+    const { data, error } = await supabaseClient
+      .from('hotel_stays')
+      .select('*')
+      .order('check_in', { ascending: true });
+    if(error) throw error;
+    hotels = (data || []).map(rowToHotel);
+  }catch(e){
+    console.warn('No se pudieron cargar los hoteles', e);
+    hotels = [];
+  }
+}
+
+function rowToHotel(row){
+  return { id: row.id, hotel_name: row.hotel_name || '', check_in: row.check_in, check_out: row.check_out, address: row.address || '' };
+}
+
+async function upsertHotelRemote(hotel, notify){
+  try{
+    const { error } = await supabaseClient.from('hotel_stays').upsert({
+      id: hotel.id,
+      hotel_name: hotel.hotel_name,
+      check_in: hotel.check_in,
+      check_out: hotel.check_out,
+      address: hotel.address || '',
+      updated_at: new Date().toISOString()
+    });
+    if(error) throw error;
+    if(notify) showStatus('guardado ✓');
+  }catch(e){
+    console.warn('Error guardando hotel', e);
+    if(notify) showStatus('sin conexión, se reintentará');
+  }
+}
+
+async function deleteHotelRemote(id){
+  try{
+    const { error } = await supabaseClient.from('hotel_stays').delete().eq('id', id);
+    if(error) throw error;
+  }catch(e){
+    console.warn('Error eliminando hotel', e);
+  }
+}
+
+function getHotelStatus(dateStr){
+  const checkInHotel = hotels.find(h => h.check_in === dateStr);
+  const checkOutHotel = hotels.find(h => h.check_out === dateStr);
+  const stayingHotel = hotels.find(h => h.check_in <= dateStr && dateStr < h.check_out);
+  return { checkInHotel, checkOutHotel, stayingHotel };
+}
+
+function renderHotelLine(dateStr){
+  const { checkInHotel, checkOutHotel, stayingHotel } = getHotelStatus(dateStr);
+  const lines = [];
+  if(checkOutHotel) lines.push({ hotel: checkOutHotel, status: 'Check-out', cls: 'checkout' });
+  if(checkInHotel) lines.push({ hotel: checkInHotel, status: 'Check-in', cls: 'checkin' });
+  if(!checkInHotel && !checkOutHotel && stayingHotel) lines.push({ hotel: stayingHotel, status: '', cls: 'staying' });
+  if(!lines.length) return '';
+  return lines.map(l => `
+    <div class="hotel-line ${l.cls}">
+      <span class="hkanji">宿</span>
+      <span class="htext">${escapeHtml(l.hotel.hotel_name || 'Hotel')}</span>
+      ${l.status ? `<span class="hstatus">${l.status}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function hotelBadgeFor(dateStr){
+  const { checkInHotel, checkOutHotel } = getHotelStatus(dateStr);
+  if(checkInHotel && checkOutHotel) return '🔁';
+  if(checkInHotel) return '🛎️';
+  if(checkOutHotel) return '🧳';
+  return '';
+}
+
+function fmtShort(dstr){
+  if(!dstr) return '—';
+  const d = new Date(dstr + 'T00:00:00');
+  if(isNaN(d)) return dstr;
+  return `${d.getDate()} oct`;
+}
+
+function renderHotels(){
+  const strip = document.getElementById('hotelsStrip');
+  const panel = document.getElementById('hotelsEditPanel');
+  if(!strip || !panel) return;
+
+  strip.innerHTML = hotels.map(h => `
+    <div class="hotel-chip" data-hotel-toggle="${h.id}">
+      <div style="min-width:0;">
+        <p class="hname">${escapeHtml(h.hotel_name) || 'Hotel sin nombre'}</p>
+        ${h.address ? `<p class="haddress">${escapeHtml(h.address)}</p>` : ''}
+      </div>
+      <p class="hdates">${fmtShort(h.check_in)} – ${fmtShort(h.check_out)}</p>
+    </div>
+  `).join('') + `<div class="hotel-chip-add" id="addHotelBtn">+</div>`;
+
+  if(editHotelId){
+    const h = hotels.find(x => x.id === editHotelId) || { id: editHotelId, hotel_name:'', check_in:'', check_out:'', address:'' };
+    panel.style.display = 'block';
+    panel.innerHTML = `
+      <div class="field">
+        <label>Nombre del hotel</label>
+        <input type="text" id="hotelNameInput" value="${escapeAttr(h.hotel_name)}" placeholder="Ej. Hotel Gracery Shinjuku">
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label>Dirección</label>
+        <input type="text" id="hotelAddressInput" value="${escapeAttr(h.address || '')}" placeholder="Para inmigración, por si preguntan">
+      </div>
+      <div class="edit-row" style="margin-top:8px;">
+        <div class="field">
+          <label>Check-in</label>
+          <input type="date" id="hotelCheckinInput" value="${h.check_in || ''}">
+        </div>
+        <div class="field">
+          <label>Check-out</label>
+          <input type="date" id="hotelCheckoutInput" value="${h.check_out || ''}">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-save" id="saveHotelBtn">Guardar</button>
+        <button class="btn btn-del" id="deleteHotelBtn">Eliminar</button>
+        <button class="btn btn-edit" id="cancelHotelBtn">Cancelar</button>
+      </div>
+    `;
+  } else {
+    panel.style.display = 'none';
+    panel.innerHTML = '';
+  }
+
+  attachHotelHandlers();
+  updateSectionToggles();
+}
+
+function attachHotelHandlers(){
+  document.querySelectorAll('[data-hotel-toggle]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      editHotelId = el.getAttribute('data-hotel-toggle');
+      renderHotels();
+      document.getElementById('hotelsEditPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+
+  const addBtn = document.getElementById('addHotelBtn');
+  if(addBtn) addBtn.addEventListener('click', ()=>{
+    editHotelId = 'new-' + Date.now();
+    renderHotels();
+    document.getElementById('hotelsEditPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+
+  const saveBtn = document.getElementById('saveHotelBtn');
+  if(saveBtn) saveBtn.addEventListener('click', async ()=>{
+    const name = document.getElementById('hotelNameInput').value.trim();
+    const address = document.getElementById('hotelAddressInput').value.trim();
+    const checkin = document.getElementById('hotelCheckinInput').value;
+    const checkout = document.getElementById('hotelCheckoutInput').value;
+    if(!name || !checkin || !checkout){ showStatus('falta nombre o fechas'); return; }
+    let hotel = hotels.find(h => h.id === editHotelId);
+    if(!hotel){
+      hotel = { id: editHotelId.startsWith('new-') ? ('h' + Date.now()) : editHotelId };
+      hotels.push(hotel);
+    }
+    hotel.hotel_name = name;
+    hotel.address = address;
+    hotel.check_in = checkin;
+    hotel.check_out = checkout;
+    editHotelId = null;
+    await upsertHotelRemote(hotel, true);
+    renderHotels();
+    render();
+  });
+
+  const delBtn = document.getElementById('deleteHotelBtn');
+  if(delBtn) delBtn.addEventListener('click', async ()=>{
+    if(!confirm('¿Eliminar este hotel del itinerario?')) return;
+    const id = editHotelId;
+    hotels = hotels.filter(h => h.id !== id);
+    editHotelId = null;
+    if(!id.startsWith('new-')) await deleteHotelRemote(id);
+    renderHotels();
+    render();
+  });
+
+  const cancelBtn = document.getElementById('cancelHotelBtn');
+  if(cancelBtn) cancelBtn.addEventListener('click', ()=>{
+    editHotelId = null;
+    renderHotels();
+  });
+}
+
+async function loadFlights(){
+  try{
+    const { data, error } = await supabaseClient
+      .from('flights')
+      .select('*')
+      .order('dep_date', { ascending: true });
+    if(error) throw error;
+
+    if(data && data.length){
+      flights = data.map(rowToFlight);
+      return;
+    }
+    flights = DEFAULT_FLIGHTS.slice();
+    for(const f of flights){ await upsertFlightRemote(f); }
+  }catch(e){
+    console.warn('No se pudieron cargar los vuelos', e);
+    flights = [];
+  }
+}
+
+function rowToFlight(row){
+  return {
+    id: row.id,
+    flight_no: row.flight_no || '',
+    from_city: row.from_city || '',
+    to_city: row.to_city || '',
+    dep_date: row.dep_date,
+    dep_time: row.dep_time || '',
+    arr_date: row.arr_date,
+    arr_time: row.arr_time || ''
+  };
+}
+
+async function upsertFlightRemote(f, notify){
+  try{
+    const { error } = await supabaseClient.from('flights').upsert({
+      id: f.id,
+      flight_no: f.flight_no,
+      from_city: f.from_city,
+      to_city: f.to_city,
+      dep_date: f.dep_date,
+      dep_time: f.dep_time,
+      arr_date: f.arr_date,
+      arr_time: f.arr_time,
+      updated_at: new Date().toISOString()
+    });
+    if(error) throw error;
+    if(notify) showStatus('guardado ✓');
+  }catch(e){
+    console.warn('Error guardando vuelo', e);
+    if(notify) showStatus('sin conexión, se reintentará');
+  }
+}
+
+async function deleteFlightRemote(id){
+  try{
+    const { error } = await supabaseClient.from('flights').delete().eq('id', id);
+    if(error) throw error;
+  }catch(e){
+    console.warn('Error eliminando vuelo', e);
+  }
+}
+
+function renderFlightLine(dateStr){
+  const events = [];
+  flights.filter(f => f.arr_date === dateStr).forEach(f => events.push({ time: f.arr_time || '00:00', type: 'arr', f }));
+  flights.filter(f => f.dep_date === dateStr).forEach(f => events.push({ time: f.dep_time || '00:00', type: 'dep', f }));
+  events.sort((a, b) => a.time.localeCompare(b.time));
+
+  return events.map(ev => {
+    if(ev.type === 'arr'){
+      return `<div class="flight-line arr">
+        <span class="fkanji">着</span>
+        <span class="ftext"><b>${escapeHtml(ev.f.flight_no || 'Vuelo')}</b> · Llegan a ${escapeHtml(ev.f.to_city || '')} · ${ev.f.arr_time || '--:--'}</span>
+      </div>`;
+    }
+    return `<div class="flight-line dep">
+      <span class="fkanji">発</span>
+      <span class="ftext"><b>${escapeHtml(ev.f.flight_no || 'Vuelo')}</b> · Sale de ${escapeHtml(ev.f.from_city || '')} · ${ev.f.dep_time || '--:--'}</span>
+    </div>`;
+  }).join('');
+}
+
+function flightBadgeFor(dateStr){
+  const isDep = flights.some(f => f.dep_date === dateStr);
+  const isArr = flights.some(f => f.arr_date === dateStr);
+  if(isDep && isArr) return '🔁';
+  if(isDep) return '🛫';
+  if(isArr) return '🛬';
+  return '';
+}
+
+function renderFlights(){
+  const strip = document.getElementById('flightsStrip');
+  const panel = document.getElementById('flightsEditPanel');
+  if(!strip || !panel) return;
+
+  strip.innerHTML = flights.map(f => `
+    <div class="flight-chip" data-flight-toggle="${f.id}">
+      <div>
+        <div class="fname">${escapeHtml(f.flight_no) || 'Vuelo'}</div>
+        <div class="froute">${escapeHtml(f.from_city || '?')} → ${escapeHtml(f.to_city || '?')}</div>
+      </div>
+      <div class="fdates">${fmtShort(f.dep_date)} ${f.dep_time || ''}<br>${fmtShort(f.arr_date)} ${f.arr_time || ''}</div>
+    </div>
+  `).join('') + `<div class="hotel-chip-add" id="addFlightBtn">+ Agregar vuelo</div>`;
+
+  if(editFlightId){
+    const f = flights.find(x => x.id === editFlightId) || { id: editFlightId, flight_no:'', from_city:'', to_city:'', dep_date:'', dep_time:'', arr_date:'', arr_time:'' };
+    panel.style.display = 'block';
+    panel.innerHTML = `
+      <div class="field">
+        <label>Número de vuelo</label>
+        <input type="text" id="flightNoInput" value="${escapeAttr(f.flight_no)}" placeholder="Ej. NH117">
+      </div>
+      <div class="edit-row" style="margin-top:8px;">
+        <div class="field">
+          <label>Origen</label>
+          <input type="text" id="flightFromInput" value="${escapeAttr(f.from_city)}" placeholder="Ej. Seattle">
+        </div>
+        <div class="field">
+          <label>Destino</label>
+          <input type="text" id="flightToInput" value="${escapeAttr(f.to_city)}" placeholder="Ej. Tokio (Haneda)">
+        </div>
+      </div>
+      <div class="edit-row" style="margin-top:8px;">
+        <div class="field">
+          <label>Fecha salida</label>
+          <input type="date" id="flightDepDateInput" value="${f.dep_date || ''}">
+        </div>
+        <div class="field">
+          <label>Hora salida</label>
+          <input type="time" id="flightDepTimeInput" value="${f.dep_time || ''}">
+        </div>
+      </div>
+      <div class="edit-row" style="margin-top:8px;">
+        <div class="field">
+          <label>Fecha llegada</label>
+          <input type="date" id="flightArrDateInput" value="${f.arr_date || ''}">
+        </div>
+        <div class="field">
+          <label>Hora llegada</label>
+          <input type="time" id="flightArrTimeInput" value="${f.arr_time || ''}">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-save" id="saveFlightBtn">Guardar</button>
+        <button class="btn btn-del" id="deleteFlightBtn">Eliminar</button>
+        <button class="btn btn-edit" id="cancelFlightBtn">Cancelar</button>
+      </div>
+    `;
+  } else {
+    panel.style.display = 'none';
+    panel.innerHTML = '';
+  }
+
+  attachFlightHandlers();
+  updateSectionToggles();
+}
+
+function attachFlightHandlers(){
+  document.querySelectorAll('[data-flight-toggle]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      editFlightId = el.getAttribute('data-flight-toggle');
+      renderFlights();
+      document.getElementById('flightsEditPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+
+  const addBtn = document.getElementById('addFlightBtn');
+  if(addBtn) addBtn.addEventListener('click', ()=>{
+    editFlightId = 'new-' + Date.now();
+    renderFlights();
+    document.getElementById('flightsEditPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+
+  const saveBtn = document.getElementById('saveFlightBtn');
+  if(saveBtn) saveBtn.addEventListener('click', async ()=>{
+    const flightNo = document.getElementById('flightNoInput').value.trim();
+    const from = document.getElementById('flightFromInput').value.trim();
+    const to = document.getElementById('flightToInput').value.trim();
+    const depDate = document.getElementById('flightDepDateInput').value;
+    const depTime = document.getElementById('flightDepTimeInput').value;
+    const arrDate = document.getElementById('flightArrDateInput').value;
+    const arrTime = document.getElementById('flightArrTimeInput').value;
+    if(!flightNo || !depDate || !arrDate){ showStatus('falta número de vuelo o fechas'); return; }
+    let f = flights.find(x => x.id === editFlightId);
+    if(!f){
+      f = { id: editFlightId.startsWith('new-') ? ('f' + Date.now()) : editFlightId };
+      flights.push(f);
+    }
+    f.flight_no = flightNo; f.from_city = from; f.to_city = to;
+    f.dep_date = depDate; f.dep_time = depTime; f.arr_date = arrDate; f.arr_time = arrTime;
+    editFlightId = null;
+    await upsertFlightRemote(f, true);
+    renderFlights();
+    render();
+  });
+
+  const delBtn = document.getElementById('deleteFlightBtn');
+  if(delBtn) delBtn.addEventListener('click', async ()=>{
+    if(!confirm('¿Eliminar este vuelo?')) return;
+    const id = editFlightId;
+    flights = flights.filter(f => f.id !== id);
+    editFlightId = null;
+    if(!id.startsWith('new-')) await deleteFlightRemote(id);
+    renderFlights();
+    render();
+  });
+
+  const cancelBtn2 = document.getElementById('cancelFlightBtn');
+  if(cancelBtn2) cancelBtn2.addEventListener('click', ()=>{
+    editFlightId = null;
+    renderFlights();
+  });
+}
+
+function cityColor(city){
+  const key = (city||'').trim().toLowerCase().split('/')[0].trim();
+  return CITY_COLORS[key] || '#8a8fa3';
+}
+
+function cityKanji(city){
+  const key = (city||'').trim().toLowerCase().split('/')[0].trim();
+  return CITY_KANJI[key] || '';
+}
+
+function fmtDate(dstr){
+  const d = new Date(dstr + 'T00:00:00');
+  if(isNaN(d)) return {dow:'', num: dstr};
+  return { dow: DOW[d.getDay()], num: `${d.getDate()} oct` };
+}
+
+function parseNotes(notes){
+  return (notes||'').split('\n').filter(l => l.trim().length);
+}
+
+function render(){
+  days.sort((a,b)=> a.date.localeCompare(b.date));
+  const tl = document.getElementById('timeline');
+
+  const japanDays = days.filter(d => d.city && !/seattle/i.test(d.city));
+  document.getElementById('statDays').textContent = japanDays.length;
+  const cityGroups = new Set(japanDays.map(d => {
+    const key = d.city.toLowerCase().split('/')[0].split('(')[0].trim();
+    return (key === 'ginza' || key === 'tokyo') ? 'tokio' : key;
+  }));
+  document.getElementById('statCities').textContent = cityGroups.size;
+
+  if(!days.length){
+    tl.innerHTML = '<div class="empty">No hay días todavía. Toca + para agregar uno.</div>';
+    return;
+  }
+
+  tl.innerHTML = days.map((day, idx) => {
+    const { dow, num } = fmtDate(day.date);
+    const color = cityColor(day.city);
+    const catStyle = CATEGORY_STYLES[day.category] || CATEGORY_STYLES['Sin categoría'];
+    const isOpen = openId === day.id;
+    const isEditing = editId === day.id;
+
+    let bodyContent;
+    const hotelLineHtml = renderHotelLine(day.date);
+    const flightLineHtml = renderFlightLine(day.date);
+    if(isEditing){
+      const activities = day.activities || [];
+      bodyContent = `
+        ${flightLineHtml}
+        ${hotelLineHtml}
+        <div class="edit-row">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" value="${day.date}" data-field="date" data-id="${day.id}">
+          </div>
+          <div class="field">
+            <label>Ciudad / zona</label>
+            <input type="text" value="${escapeAttr(day.city)}" data-field="city" data-id="${day.id}" placeholder="Ej. Ueno, si cambia el plan">
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label>Categoría</label>
+          <select data-field="category" data-id="${day.id}">
+            ${Object.keys(CATEGORY_STYLES).map(c => `<option value="${c}" ${c===day.category?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="field" style="margin-top:14px;">
+          <label>Plan del día</label>
+          <div class="activity-edit-list" data-activity-list="${day.id}">
+            ${activities.length ? activities.map((act, i) => `
+              <div class="activity-edit-row">
+                <input type="text" value="${escapeAttr(act.text)}" data-activity-idx="${i}" data-id="${day.id}" placeholder="Ej. Ir al Ramen Hidakaya">
+                <button type="button" class="remove-activity" data-action="remove-activity" data-idx="${i}" data-id="${day.id}">✕</button>
+              </div>
+            `).join('') : `<p class="hint">Aún no hay actividades. Agrega la primera abajo.</p>`}
+          </div>
+          <button type="button" class="btn btn-edit" style="margin-top:8px;" data-action="add-activity" data-id="${day.id}">+ Agregar actividad</button>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn btn-save" data-action="save" data-id="${day.id}">Guardar</button>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:14px;">
+          <label>Notas generales</label>
+          <textarea data-field="notes" data-id="${day.id}" placeholder="Horarios, ideas sueltas, reservaciones...">${escapeHtml(day.notes)}</textarea>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-save" data-action="save" data-id="${day.id}">Guardar</button>
+        </div>
+      `;
+    } else {
+      const activities = day.activities || [];
+      const hasNotes = day.notes && day.notes.trim().length;
+      bodyContent = `
+        ${flightLineHtml}
+        ${hotelLineHtml}
+        ${activities.map((act, i) => `
+          <label class="note-line ${act.checked?'checked':''}">
+            <input type="checkbox" data-check="${i}" data-id="${day.id}" ${act.checked?'checked':''}>
+            <span class="txt">${escapeHtml(act.text)}</span>
+          </label>
+        `).join('')}
+        ${hasNotes ? `
+          <div class="notes-block">
+            <p class="notes-label">Notas</p>
+            <p class="notes-text">${escapeHtml(day.notes).replace(/\n/g,'<br>')}</p>
+          </div>
+        ` : ''}
+        ${(!activities.length && !hasNotes) ? `<p class="hint">Sin plan todavía.</p>` : ''}
+        <div class="btn-row">
+          <button class="btn btn-edit" data-action="edit" data-id="${day.id}">Editar</button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="day">
+        <div class="rail-col">
+          <div class="dot" style="outline-color:${color}55;"><span>${idx+1}</span></div>
+          <div class="connector"></div>
+        </div>
+        <div class="card ${isOpen || isEditing ? 'open':''}" style="border-color:${isOpen?color+'55':'var(--line)'}">
+          <div class="card-head" data-toggle="${day.id}">
+            <div class="date-block">
+              <span class="dow">${dow}</span>
+              <span class="dnum">${num}</span>
+            </div>
+            <div class="head-meta">
+              <p class="city-name" style="color:${color}">${escapeHtml(day.city || 'Sin ciudad')}</p>
+              <span class="chip" style="background:${catStyle.bg}; color:${catStyle.fg}">${day.category || 'Sin categoría'}</span>${hotelBadgeFor(day.date) ? `<span class="hotel-badge">${hotelBadgeFor(day.date)}</span>` : ''}${flightBadgeFor(day.date) ? `<span class="hotel-badge">${flightBadgeFor(day.date)}</span>` : ''}
+            </div>
+            <div class="chevron">▾</div>
+          </div>
+          <div class="card-body">
+            <div class="card-body-inner">${bodyContent}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  attachHandlers();
+}
+
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(str){ return escapeHtml(str); }
+
+function attachHandlers(){
+  document.querySelectorAll('[data-toggle]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-toggle');
+      if(editId === id) return;
+      openId = (openId === id) ? null : id;
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-check]').forEach(el=>{
+    el.addEventListener('click', (e)=> e.stopPropagation());
+    el.addEventListener('change', async (e)=>{
+      const id = el.getAttribute('data-id');
+      const idx = el.getAttribute('data-check');
+      const day = days.find(d=>d.id===id);
+      day.activities[idx].checked = el.checked;
+      await upsertDayRemote(day, true);
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-action="add-activity"]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = el.getAttribute('data-id');
+      const day = days.find(d=>d.id===id);
+      if(!Array.isArray(day.activities)) day.activities = [];
+      day.activities.push({ text:'', checked:false });
+      render();
+      setTimeout(()=>{
+        const inputs = document.querySelectorAll(`[data-activity-idx][data-id="${id}"]`);
+        const last = inputs[inputs.length-1];
+        if(last) last.focus();
+      }, 30);
+    });
+  });
+
+  document.querySelectorAll('[data-action="remove-activity"]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = el.getAttribute('data-id');
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      const day = days.find(d=>d.id===id);
+      day.activities.splice(idx, 1);
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-action="edit"]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      editId = el.getAttribute('data-id');
+      openId = editId;
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-action="delete"]').forEach(el=>{
+    el.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const id = el.getAttribute('data-id');
+      if(!confirm('¿Eliminar este día del itinerario?')) return;
+      days = days.filter(d=>d.id !== id);
+      editId = null; openId = null;
+      await deleteDayRemote(id);
+      cacheLocally();
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-action="save"]').forEach(el=>{
+    el.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      const id = el.getAttribute('data-id');
+      const day = days.find(d=>d.id===id);
+      const container = el.closest('.card-body-inner');
+      container.querySelectorAll('[data-field]').forEach(f=>{
+        const field = f.getAttribute('data-field');
+        day[field] = f.value;
+      });
+      container.querySelectorAll('[data-activity-idx]').forEach(f=>{
+        const idx = parseInt(f.getAttribute('data-activity-idx'), 10);
+        if(day.activities[idx]) day.activities[idx].text = f.value;
+      });
+      day.activities = (day.activities || []).filter(a => a.text.trim().length);
+      editId = null;
+      await upsertDayRemote(day, true);
+      render();
+    });
+  });
+}
+
+document.getElementById('addDayBtn').addEventListener('click', async ()=>{
+  const lastDate = days.length ? days[days.length-1].date : '2026-10-08';
+  const next = new Date(lastDate + 'T00:00:00');
+  next.setDate(next.getDate()+1);
+  const iso = next.toISOString().slice(0,10);
+  const id = 'd' + Date.now();
+  days.push({ id, date: iso, city: '', category: 'Sin categoría', activities: [], notes: '' });
+  editId = id; openId = id;
+  await upsertDayRemote(days[days.length-1], true);
+  render();
+  setTimeout(()=>{
+    const card = document.querySelector(`[data-id="${id}"][data-field="city"]`);
+    if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 100);
+});
+
+(async function init(){
+  await Promise.all([loadDays(), loadHotels(), loadFlights()]);
+  render();
+  renderHotels();
+  renderFlights();
+})();
+</script>
+</body>
+</html>
